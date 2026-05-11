@@ -1,5 +1,5 @@
 import json
-from fastapi import APIRouter, UploadFile, File
+from fastapi import APIRouter, UploadFile, File, Request
 from sse_starlette.sse import EventSourceResponse
 from pathlib import Path
 from sqlalchemy import text as sql_text
@@ -117,10 +117,11 @@ def process_transcription(job_id: str, file_path: str):
 # UPLOAD ROUTE
 # =========================
 @router.post("/upload")
-async def upload(file: UploadFile = File(...)):
+# async def upload(file: UploadFile = File(...)):
+async def upload(request: Request, file: UploadFile = File(...)):
 
     job_id = str(uuid.uuid4())
-
+    base_url = str(request.base_url).rstrip("/")
     file_path = UPLOAD_DIR / f"{job_id}_{file.filename}"
 
     # save file
@@ -154,7 +155,7 @@ async def upload(file: UploadFile = File(...)):
 
     return {
         "job_id": job_id,
-        "stream_url": f"http://127.0.0.1:8000/api/stream/{job_id}"
+        "stream_url": f"{base_url}/api/stream/{job_id}"
     }
 
 
