@@ -29,7 +29,8 @@ CHUNK_BASE_DIR.mkdir(parents=True, exist_ok=True)
 # =========================
 def process_transcription(job_id: str, file_path: str):
     chunk_dir = CHUNK_BASE_DIR / job_id
-
+    print("🔥 WORKER START:", job_id)
+    print("📂 FILE:", file_path)
     # update status → processing
     with engine.begin() as conn:
         conn.execute(sql_text("""
@@ -40,7 +41,8 @@ def process_transcription(job_id: str, file_path: str):
 
     try:
         chunk_paths = split_audio(file_path, str(chunk_dir), segment_time=10)
-
+        print("✂️ CHUNKS CREATED:", len(chunk_paths))
+        print(chunk_paths)
         if not chunk_paths:
             raise RuntimeError("No audio chunks were created")
 
@@ -49,7 +51,10 @@ def process_transcription(job_id: str, file_path: str):
             job_progress[job_id]["percent"] = 0
 
         for chunk_index, chunk_path in enumerate(chunk_paths, start=1):
+            print("🎧 PROCESS CHUNK:", chunk_path)
+            print("🤖 TRANSCRIBING...")
             segments, info = model.transcribe(chunk_path)
+            print("📝 CHUNK TEXT:", chunk_text)
             chunk_text = ""
 
             for segment in segments:
