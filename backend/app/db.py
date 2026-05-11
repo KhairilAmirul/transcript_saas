@@ -1,5 +1,9 @@
-from sqlalchemy import create_engine, text
+import os
+from sqlalchemy import create_engine
 
-DB_URL = "mysql+pymysql://root:@localhost/transcript_saas"
+DATABASE_URL = os.getenv(
+    "DATABASE_URL",
+    "mysql+pymysql://root:PASSWORD@localhost/transcript_saas"
+)
 
-engine = create_engine(DB_URL, pool_pre_ping=True)
+engine = create_engine(DATABASE_URL)
