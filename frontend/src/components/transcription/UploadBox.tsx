@@ -173,7 +173,8 @@ export default function UploadBox() {
 
   const [startTime, setStartTime] = useState<number | null>(null);
   const [eta, setEta] = useState<number | null>(null);
-
+  const API = process.env.NEXT_PUBLIC_API_URL;
+  
   useEffect(() => {
     if (progress > 0 && startTime) {
       const elapsed = (Date.now() - startTime) / 1000;
@@ -193,7 +194,8 @@ export default function UploadBox() {
     const formData = new FormData();
     formData.append("file", f);
 
-    const res = await fetch("http://127.0.0.1:8000/api/upload", {
+    // const res = await fetch("http://127.0.0.1:8000/api/upload", {
+    const res = await fetch(`${API}/api/upload`, {
       method: "POST",
       body: formData,
     });
@@ -209,8 +211,9 @@ export default function UploadBox() {
   const startStream = (id: string) => {
     setStatus("streaming");
 
-    const es = new EventSource(`http://127.0.0.1:8000/api/stream/${id}`);
-
+    // const es = new EventSource(`http://127.0.0.1:8000/api/stream/${id}`);
+    const es = new EventSource(`${API}/api/stream/${id}`);
+    
     es.onmessage = (event) => {
       setText((prev) => prev + event.data + " ");
     };
